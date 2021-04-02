@@ -3,7 +3,7 @@
 2D semantic segmentator : Yolact. (Transfer learned model. Dataset : YCB video dataset)
 
 ### weight file
-https://drive.google.com/file/d/1wpLNNda-oqxvao70w27iqnyjBcg5EWcx/view?usp=sharing
+https://drive.google.com/file/d/1spkxoWMWks7gUC_O01JvReRq8ZMIisb1/view?usp=sharing
 
 densefusion_live $ mkdir ./tools/yolact/weight
 
