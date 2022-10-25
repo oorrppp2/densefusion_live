@@ -146,14 +146,14 @@ ymap = np.array([[i for i in range(640)] for j in range(480)])
 # cam_cy = 241.3109
 # cam_fx = 1066.778
 # cam_fy = 1067.487
-cam_cx = 318.892
-cam_cy = 240.121
-cam_fx = 614.678
-cam_fy = 614.93
-cam_scale = 0.001
-K = [[cam_fx , 0 , cam_cx],
-     [0, cam_fy, cam_cy],
-     [0, 0, 1]]
+# cam_cx = 318.863
+# cam_cy = 241.327
+# cam_fx = 383.202
+# cam_fy = 383.202
+# cam_scale = 0.001
+# K = [[cam_fx , 0 , cam_cx],
+#      [0, cam_fy, cam_cy],
+#      [0, 0, 1]]
 # cam_scale = 10000.0
 num_obj = 21
 img_width = 480
@@ -457,6 +457,16 @@ try:
     align_to = rs.stream.color
     align = rs.align(align_to)
     pipeline.start(config)
+    
+    cam_cx = 0
+    cam_cy = 0
+    cam_fx = 0
+    cam_fy = 0
+    cam_scale = 0.001
+    K = [[cam_fx , 0 , cam_cx],
+        [0, cam_fy, cam_cy],
+        [0, 0, 1]]
+
 
     while True:
         frame_i += 1
@@ -465,8 +475,18 @@ try:
 
         color_frame = frames.get_color_frame()
         color_image = np.asanyarray(color_frame.get_data())
-        # r, g, b = cv2.split(color_image)
-        # color_image = cv2.merge((b, g, r))
+
+        if cam_cx == 0 and cam_cy == 0 and cam_fx == 0 and cam_fy == 0:
+            color_intrin = color_frame.profile.as_video_stream_profile().intrinsics
+            cam_cx = color_intrin.ppx
+            cam_cy = color_intrin.ppy
+            cam_fx = color_intrin.fx
+            cam_fy = color_intrin.fy
+            K = [[cam_fx , 0 , cam_cx],
+                [0, cam_fy, cam_cy],
+                [0, 0, 1]]
+        r, g, b = cv2.split(color_image)
+        bgr_img = cv2.merge((b, g, r))
 
         cv2.imshow('color_image', color_image)
 
@@ -554,7 +574,7 @@ try:
                 pt1 = (xmap_masked - cam_cy) * pt2 / cam_fy
                 cloud = np.concatenate((pt0, pt1, pt2), axis=1)
 
-                img_masked = np.array(img)[:, :, :3]
+                img_masked = np.array(bgr_img)[:, :, :3]
                 img_masked = np.transpose(img_masked, (2, 0, 1))
                 img_masked = img_masked[:, rmin:rmax, cmin:cmax]
 
